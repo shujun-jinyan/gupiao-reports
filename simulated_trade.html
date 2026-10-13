@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="60">
+<title>模拟交易报告 - 2026-10-13</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#0d1117; color:#c9d1d9; font-family:'Microsoft YaHei',sans-serif; padding:20px; }
+    .container { max-width:1200px; margin:0 auto; }
+    .header { text-align:center; padding:30px 0; border-bottom:1px solid #21262d; margin-bottom:24px; }
+    .header h1 { font-size:28px; color:#f0f6fc; margin-bottom:8px; }
+    .header .subtitle { font-size:14px; color:#8b949e; }
+    .summary { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
+    .summary-card { background:#161b22; border:1px solid #21262d; border-radius:12px; padding:18px 12px; text-align:center; }
+    .summary-card .label { font-size:12px; color:#8b949e; margin-bottom:8px; }
+    .summary-card .value { font-size:24px; font-weight:bold; font-family:'Consolas',monospace; }
+    .card { background:#161b22; border:1px solid #21262d; border-radius:12px; padding:24px; margin-bottom:24px; }
+    .card-title { font-size:18px; color:#f0f6fc; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid #21262d; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { color:#8b949e; padding:12px 8px; text-align:left; border-bottom:2px solid #30363d; font-size:11px; }
+    tbody td { padding:12px 8px; border-bottom:1px solid #21262d; }
+    tbody tr:hover { background:#1a1f2e; }
+    .code { font-family:'Consolas',monospace; color:#58a6ff; }
+    .name { font-weight:500; }
+    .price { font-family:'Consolas',monospace; color:#f0f6fc; }
+    .chg { font-family:'Consolas',monospace; font-weight:bold; }
+    .num { font-family:'Consolas',monospace; }
+    .actions { background:#1a2a3a; border:1px solid #1f6feb; border-radius:8px; padding:16px; margin-bottom:20px; }
+    .actions h4 { color:#58a6ff; margin-bottom:10px; }
+    .action-item { padding:4px 0; font-size:14px; }
+    .no-action { color:#8b949e; font-style:italic; }
+    .market-box { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .market-item { background:#0d1117; border-radius:8px; padding:14px; text-align:center; }
+    .m-label { font-size:11px; color:#8b949e; margin-bottom:6px; }
+    .m-value { font-size:20px; font-weight:bold; font-family:'Consolas',monospace; color:#f0f6fc; }
+    .footer { text-align:center; margin-top:30px; padding:20px 0; color:#484f58; font-size:12px; border-top:1px solid #21262d; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 模拟交易报告（双引擎融合版）</h1>
+        <div class="subtitle">5万本金 | 竞价追强 + 复盘低吸 双策略 | 2026-10-13 10:35 | 60秒自动刷新</div>
+    </div>
+
+    <div class="summary">
+        <div class="summary-card"><div class="label">总资产</div><div class="value" style="color:#f0f6fc">48,169</div></div>
+        <div class="summary-card"><div class="label">总盈亏</div><div class="value" style="color:#ff6b6b">-1,831<br><span style="font-size:14px">(-3.66%)</span></div></div>
+        <div class="summary-card"><div class="label">今日盈亏</div><div class="value" style="color:#3fb950">+0</div></div>
+        <div class="summary-card"><div class="label">可用现金</div><div class="value" style="color:#58a6ff">35,891</div></div>
+        <div class="summary-card"><div class="label">持仓/胜率</div><div class="value" style="color:#ffaa00">3只<br><span style="font-size:14px">12/31 (39%)</span></div></div>
+    </div>
+
+    
+    <div class="card">
+        <div class="card-title">🌐 复盘大盘环境（今日仓位依据）</div>
+        <div class="market-box">
+            <div class="market-item"><div class="m-label">预测置信度</div><div class="m-value" style="color:#ffaa00">40%</div></div>
+            <div class="market-item"><div class="m-label">趋势判断</div><div class="m-value" style="font-size:14px">窄幅震荡，明日大概率延续震荡格局</div></div>
+            <div class="market-item"><div class="m-label">仓位模式</div><div class="m-value" style="font-size:14px;color:#ffaa00">均衡模式（七成仓位系数）</div></div>
+            <div class="market-item"><div class="m-label">仓位系数</div><div class="m-value">×0.7</div></div>
+        </div>
+        <div style="font-size:12px;color:#8b949e;margin-top:8px">多空力量均衡，等待方向选择｜MA5(3824)<MA10(3876)，短期均线死叉，注意风险</div>
+    </div>
+
+    <div class="actions">
+        <h4>⚡ 本次操作</h4>
+        <div class="no-action">本次无交易操作</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📈 当前持仓</div>
+        <div style="overflow-x:auto">
+        <table>
+            <thead><tr><th>代码</th><th>名称</th><th>策略来源</th><th>摊薄成本</th><th>现价</th><th>今日涨跌</th><th>持仓盈亏</th><th>持仓量</th><th>止损价</th><th>止盈价</th></tr></thead>
+            <tbody>
+        <tr>
+            <td class="code">301277</td>
+            <td class="name">新天地</td>
+            <td><span style="color:#58a6ff;font-weight:bold">底部</span></td>
+            <td class="price">10.54</td>
+            <td class="price">10.18</td>
+            <td class="chg" style="color:#00cc66">-3.87%</td>
+            <td class="chg" style="color:#00cc66">-180元<br>(-3.42%)</td>
+            <td class="num">500</td>
+            <td class="price">10.12</td>
+            <td class="price">11.59</td>
+        </tr>
+        <tr>
+            <td class="code">600098</td>
+            <td class="name">广州发展</td>
+            <td><span style="color:#58a6ff;font-weight:bold">底部</span></td>
+            <td class="price">6.47</td>
+            <td class="price">6.36</td>
+            <td class="chg" style="color:#00cc66">-1.40%</td>
+            <td class="chg" style="color:#00cc66">-99元<br>(-1.70%)</td>
+            <td class="num">900</td>
+            <td class="price">6.21</td>
+            <td class="price">7.12</td>
+        </tr>
+        <tr>
+            <td class="code">603528</td>
+            <td class="name">多伦科技</td>
+            <td><span style="color:#8b949e;font-weight:bold">强势</span></td>
+            <td class="price">7.49</td>
+            <td class="price">7.32</td>
+            <td class="chg" style="color:#ff4444">+3.83%</td>
+            <td class="chg" style="color:#00cc66">-34元<br>(-2.27%)</td>
+            <td class="num">200</td>
+            <td class="price">7.27</td>
+            <td class="price">8.09</td>
+        </tr></tbody>
+        </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📋 最近交易记录（含决策依据）</div>
+        <div style="overflow-x:auto">
+        <table>
+            <thead><tr><th>时间</th><th>方向</th><th>代码</th><th>名称</th><th>来源</th><th>价格</th><th>数量</th><th>成交额</th><th>决策依据</th></tr></thead>
+            <tbody>
+        <tr>
+            <td style="font-size:12px">10-13 09:35:01</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">603528</td>
+            <td class="name">多伦科技</td>
+            <td><span style="color:#8b949e">强势</span></td>
+            <td class="price">7.49</td>
+            <td class="num">200</td>
+            <td class="num">1498元</td>
+            <td style="font-size:11px;color:#8b949e">v3.0弱市强势通道·竞价T1轨｜强势放行：评分1.00+盘中+6.2%拉升，承接良</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-12 09:35:02</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">300019</td>
+            <td class="name">硅宝科技</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">15.04</td>
+            <td class="num">100</td>
+            <td class="num">1504元</td>
+            <td style="font-size:11px;color:#8b949e">硬止损15.11触发｜盈亏-61元(-3.88%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-12 09:35:01</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">300530</td>
+            <td class="name">领湃科技</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">29.50</td>
+            <td class="num">100</td>
+            <td class="num">2950元</td>
+            <td style="font-size:11px;color:#8b949e">持有4天达上限离场｜盈亏+636元(+27.58%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-09 10:35:01</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">300019</td>
+            <td class="name">硅宝科技</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">15.58</td>
+            <td class="num">100</td>
+            <td class="num">1558元</td>
+            <td style="font-size:11px;color:#8b949e">v3.2反弹强势捕捉｜盘中动量1.15(涨+13.5%/量比1.9x/换手6.4%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-08 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">300530</td>
+            <td class="name">领湃科技</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">23.06</td>
+            <td class="num">100</td>
+            <td class="num">2306元</td>
+            <td style="font-size:11px;color:#8b949e">v3.2反弹强势捕捉｜盘中动量1.30(涨+14.9%/量比3.0x/换手6.0%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-08 10:35:00</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">600098</td>
+            <td class="name">广州发展</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">6.47</td>
+            <td class="num">900</td>
+            <td class="num">5823元</td>
+            <td style="font-size:11px;color:#8b949e">复盘底部策略：平台60天突破｜今日+2.4%回踩企稳走强；量比95.18放量确认；M</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-08 10:35:00</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">301277</td>
+            <td class="name">新天地</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">10.54</td>
+            <td class="num">500</td>
+            <td class="num">5270元</td>
+            <td style="font-size:11px;color:#8b949e">复盘底部策略：平台20天突破｜今日+0.7%回踩企稳走强；量比130.35放量确认；</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-08 09:35:01</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">300893</td>
+            <td class="name">松原安全</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">15.08</td>
+            <td class="num">200</td>
+            <td class="num">3016元</td>
+            <td style="font-size:11px;color:#8b949e">持有8天达上限离场｜盈亏+22元(+0.74%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-08 09:35:01</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">688573</td>
+            <td class="name">信宇人</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">17.55</td>
+            <td class="num">100</td>
+            <td class="num">1755元</td>
+            <td style="font-size:11px;color:#8b949e">持有9天达上限离场｜盈亏+32元(+1.88%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">10-08 09:35:01</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">002189</td>
+            <td class="name">中光学</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">19.04</td>
+            <td class="num">300</td>
+            <td class="num">5712元</td>
+            <td style="font-size:11px;color:#8b949e">持有17天达上限离场｜盈亏-104元(-1.79%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-30 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">300893</td>
+            <td class="name">松原安全</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">14.93</td>
+            <td class="num">200</td>
+            <td class="num">2986元</td>
+            <td style="font-size:11px;color:#8b949e">v3.2反弹强势捕捉｜盘中动量1.30(涨+18.4%/量比2.3x/换手7.2%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-29 13:45:03</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">688573</td>
+            <td class="name">信宇人</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">17.16</td>
+            <td class="num">100</td>
+            <td class="num">1716元</td>
+            <td style="font-size:11px;color:#8b949e">v3.2反弹强势捕捉｜盘中动量1.15(涨+12.7%/量比1.9x/换手13.6%</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-29 13:45:01</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">300162</td>
+            <td class="name">雷曼光电</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">8.43</td>
+            <td class="num">300</td>
+            <td class="num">2529元</td>
+            <td style="font-size:11px;color:#8b949e">硬止损8.47触发｜盈亏-98元(-3.72%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-28 13:15:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">300162</td>
+            <td class="name">雷曼光电</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">8.73</td>
+            <td class="num">300</td>
+            <td class="num">2619元</td>
+            <td style="font-size:11px;color:#8b949e">v3.2反弹强势捕捉｜盘中动量1.30(涨+13.7%/量比4.0x/换手22.8%</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-28 10:35:03</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">300921</td>
+            <td class="name">南凌科技</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">15.51</td>
+            <td class="num">300</td>
+            <td class="num">4653元</td>
+            <td style="font-size:11px;color:#8b949e">硬止损15.55触发｜盈亏-217元(-4.46%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-28 10:35:03</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">001287</td>
+            <td class="name">中电港</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">23.25</td>
+            <td class="num">200</td>
+            <td class="num">4650元</td>
+            <td style="font-size:11px;color:#8b949e">硬止损23.91触发｜盈亏-342元(-6.86%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-23 10:26:19</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">002803</td>
+            <td class="name">吉宏股份</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">19.96</td>
+            <td class="num">200</td>
+            <td class="num">3992元</td>
+            <td style="font-size:11px;color:#8b949e">硬止损20.01触发｜盈亏-185元(-4.44%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-22 15:09:11</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">600354</td>
+            <td class="name">敦煌种业</td>
+            <td><span style="color:#c084fc">回踩</span></td>
+            <td class="price">10.12</td>
+            <td class="num">500</td>
+            <td class="num">5060元</td>
+            <td style="font-size:11px;color:#8b949e">硬止损10.30触发｜盈亏-260元(-4.90%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-21 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">002803</td>
+            <td class="name">吉宏股份</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">20.84</td>
+            <td class="num">200</td>
+            <td class="num">4168元</td>
+            <td style="font-size:11px;color:#8b949e">复盘底部策略：平台30天突破｜今日+1.7%回踩企稳走强；量比159.12放量确认；</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-21 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">002189</td>
+            <td class="name">中光学</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">19.35</td>
+            <td class="num">300</td>
+            <td class="num">5805元</td>
+            <td style="font-size:11px;color:#8b949e">复盘底部策略：平台40天突破｜今日+0.0%回踩企稳走强；量比81.83放量确认；M</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-21 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">300921</td>
+            <td class="name">南凌科技</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">16.20</td>
+            <td class="num">300</td>
+            <td class="num">4860元</td>
+            <td style="font-size:11px;color:#8b949e">复盘底部策略：平台30天突破｜今日+0.9%回踩企稳走强；量比133.47放量确认；</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-21 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">001287</td>
+            <td class="name">中电港</td>
+            <td><span style="color:#58a6ff">底部</span></td>
+            <td class="price">24.91</td>
+            <td class="num">200</td>
+            <td class="num">4982元</td>
+            <td style="font-size:11px;color:#8b949e">复盘底部策略：平台30天突破｜今日+1.6%回踩企稳走强；量比148.29放量确认；</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-21 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">600354</td>
+            <td class="name">敦煌种业</td>
+            <td><span style="color:#c084fc">回踩</span></td>
+            <td class="price">10.62</td>
+            <td class="num">500</td>
+            <td class="num">5310元</td>
+            <td style="font-size:11px;color:#8b949e">复盘回踩策略：回调5天（FFD窗口）; 回撤17.0%（深回踩，连板利润回吐过半）;</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-21 09:35:01</td>
+            <td><span style="color:#ff6b6b;font-weight:bold">卖出</span></td>
+            <td class="code">688244</td>
+            <td class="name">永信至诚</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">16.28</td>
+            <td class="num">100</td>
+            <td class="num">1628元</td>
+            <td style="font-size:11px;color:#8b949e">持有3天达上限离场｜盈亏+9元(+0.58%)</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">09-18 10:35:02</td>
+            <td><span style="color:#3fb950;font-weight:bold">买入</span></td>
+            <td class="code">688244</td>
+            <td class="name">永信至诚</td>
+            <td><span style="color:#8b949e">盘中强势</span></td>
+            <td class="price">16.12</td>
+            <td class="num">100</td>
+            <td class="num">1612元</td>
+            <td style="font-size:11px;color:#8b949e">v3.2反弹强势捕捉｜盘中动量1.15(涨+10.9%/量比1.6x/换手7.7%)</td>
+        </tr></tbody>
+        </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>⚠️ 模拟交易记录，不构成真实投资建议。</p>
+        <p>模拟交易系统 v2.0 | 竞价三轨 + 回踩低吸 + 底部突破 三引擎 | 大盘预测动态调仓 | 日亏-3%熔断</p>
+    </div>
+</div>
+</body>
+</html>

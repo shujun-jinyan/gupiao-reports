@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股量化报告站</title>
+<style>
+  :root{--bg:#0b0f1a;--card:#141b2d;--card2:#1b2440;--line:#26314f;--fg:#e8edf7;--muted:#8a97b4;--acc:#4f8cff;--green:#2fd35a;--red:#ff5a68;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#16203a 0%,var(--bg) 55%);color:var(--fg);min-height:100vh;}
+  .wrap{max-width:880px;margin:0 auto;padding:40px 20px 80px;}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:.5px;}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:28px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+  a.card{display:block;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:14px;padding:18px 18px;text-decoration:none;color:var(--fg);transition:.18s;position:relative;overflow:hidden;}
+  a.card:hover{transform:translateY(-2px);border-color:var(--acc);box-shadow:0 8px 30px rgba(79,140,255,.18);}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(79,140,255,.15);
+    color:#9dbdff;border:1px solid rgba(79,140,255,.3);margin-bottom:10px;}
+  .name{font-size:17px;font-weight:600;margin:2px 0 6px;}
+  .desc{color:var(--muted);font-size:13px;line-height:1.5;}
+  .foot{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;vertical-align:middle;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="dot"></span>A股量化报告站</h1>
+  <div class="sub">静态托管 · 每日自动更新 · 不依赖本机</div>
+
+  <div class="grid">
+    <a class="card" href="./daily_review.html">
+      <span class="tag">收盘复盘</span>
+      <div class="name">每日收盘复盘</div>
+      <div class="desc">四大通道汇总、情绪周期、次日预判与操作建议</div>
+    </a>
+    <a class="card" href="./auction.html">
+      <span class="tag">09:25</span>
+      <div class="name">早盘竞价选股</div>
+      <div class="desc">Tier1–T4 竞价轨，量比/换手/占比四维共振打分</div>
+    </a>
+    <a class="card" href="./hb_breakout.html">
+      <span class="tag">盘中/收盘</span>
+      <div class="name">横盘放量突破选股</div>
+      <div class="desc">平台整理 + 放量突破，按板块分组与回踩买位</div>
+    </a>
+    <a class="card" href="./bottom_start.html">
+      <span class="tag">底部</span>
+      <div class="name">底部启动选股结果</div>
+      <div class="desc">底部区间右侧启动、资金异动与形态确认</div>
+    </a>
+    <a class="card" href="./simulated_trade.html">
+      <span class="tag">模拟盘</span>
+      <div class="name">模拟交易报告</div>
+      <div class="desc">账户总览、持仓浮盈、盯盘记录与调仓日志</div>
+    </a>
+  </div>
+
+  <div class="foot">
+    <span>报告每日由云端任务自动发布至此</span>
+    <span id="t">生成时间：—</span>
+  </div>
+</div>
+<script>
+  document.getElementById('t').textContent = '生成时间：2026-10-13';
+</script>
+</body>
+</html>
