@@ -199,7 +199,7 @@ footer{margin-top:20px;text-align:center;font-size:11.5px;color:var(--faint);lin
   <main id="report" class="hidden"></main>
 
   <footer>
-    数据来源：东方财富公开行情接口（实时/K线） · 诊断由本地量化规则引擎计算生成，仅供研究参考，不构成任何投资建议。<br>
+    数据来源：腾讯公开行情接口（实时/K线）+ 发布链路快照 · 诊断由本地量化规则引擎计算生成，仅供研究参考，不构成任何投资建议。<br>
     入市有风险，投资需谨慎。
   </footer>
 </div>
@@ -286,6 +286,19 @@ function injectScript(src){
     document.head.appendChild(s);
   });
 }
+/* 回调式 script 注入（JSONP：web.ifzq 的 _callback、新浪 jsonp.php） */
+function injectScriptCb(src,timeout){
+  return new Promise((resolve,reject)=>{
+    const id='_KCB'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);
+    const s=document.createElement('script');
+    const timer=setTimeout(()=>{cleanup();reject(new Error('行情接口超时'));},timeout||9000);
+    function cleanup(){clearTimeout(timer);delete window[id];s.remove();}
+    window[id]=d=>{cleanup();resolve(d);};
+    s.onerror=()=>{cleanup();reject(new Error('行情接口不可达'));};
+    s.src=src.replace('__CB__',id);
+    document.head.appendChild(s);
+  });
+}
 function secidToTcode(secid){
   const p=String(secid).split('.');
   const m=p[0],c=p[1]||p[0];
@@ -327,6 +340,7 @@ async function apiSearch(q){
     }).filter(Boolean);
   }catch(e){return[];}
 }
+const _quoteCache={};
 async function apiQuote(secid){
   if(IN_DASH){
     try{
@@ -335,14 +349,53 @@ async function apiQuote(secid){
     }catch(e){}
   }
   const code=String(secid).split('.')[1]||String(secid);
+  const cached=_quoteCache[code];
+  if(cached&&Date.now()-cached.t<30000)return cached.d;
   try{const sd=await snapQuote(code);if(sd)return sd;}catch(e){}
   try{
     const tcode=secidToTcode(secid);
     await injectScript('https://qt.gtimg.cn/q='+tcode);
     const raw=window['v_'+tcode];
     if(!raw||!raw.split)return null;
-    return txQuoteToData(raw.split('~'),code);
+    const d=txQuoteToData(raw.split('~'),code);
+    if(d&&d.f43!=null)_quoteCache[code]={t:Date.now(),d};
+    return d;
   }catch(e){return null;}
+}
+/* ---- K线多源回退（腾讯 web.ifzq JSONP → ifzq fetch → 新浪 JSONP）+ 60s 页面缓存，规避接口限流 ---- */
+const _klineCache={};
+function klineCacheGet(tcode){
+  const c=_klineCache[tcode];
+  return c&&Date.now()-c.t<60000?c.data:null;
+}
+function klineCacheSet(tcode,data){_klineCache[tcode]={t:Date.now(),data};}
+function txKlineMap(kls){
+  if(!kls||!kls.length)return null;
+  return kls.map(s=>{
+    const a=typeof s==='string'?s.split(','):s;
+    const v=+a[5],c=+a[2];
+    return{d:a[0],o:+a[1],c:c,h:+a[3],l:+a[4],v:v,a:Math.round(v*100*c)};
+  });
+}
+async function klineWebIfzq(tcode){
+  const d=await injectScriptCb(`https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tcode},day,,,140,qfq&_callback=__CB__`);
+  const node=d&&d.data&&d.data[tcode];
+  return txKlineMap(node?(node.qfqday||node.day):null);
+}
+async function klineIfzq(tcode){
+  const r=await fetch(`https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tcode},day,,,140,qfq`,{cache:'no-store'});
+  if(!r.ok)throw 0;
+  const d=JSON.parse(await r.text());
+  const node=d&&d.data&&d.data[tcode];
+  return txKlineMap(node?(node.qfqday||node.day):null);
+}
+async function klineSina(tcode){
+  const d=await injectScriptCb(`https://money.finance.sina.com.cn/quotes_service/api/jsonp.php/var%20__CB__=__CB__/CN_MarketData.getKLineData?symbol=${tcode}&scale=240&ma=no&datalen=140`);
+  if(!d||!d.length)return null;
+  return d.map(x=>{
+    const o=+x.open,c=+x.close,h=+x.high,l=+x.low,v=+x.volume/100;
+    return{d:x.day,o,c,h,l,v,a:Math.round(v*100*c)};
+  });
 }
 async function apiKline(secid,n){
   if(IN_DASH){
@@ -354,20 +407,15 @@ async function apiKline(secid,n){
   }
   const code=String(secid).split('.')[1]||String(secid);
   try{const sk=await snapKline(code);if(sk)return sk;}catch(e){}
-  try{
-    const tcode=secidToTcode(secid);
-    const r=await fetch(`https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tcode},day,,,${n},qfq`,{cache:'no-store'});
-    if(!r.ok)throw 0;
-    const d=JSON.parse(await r.text());
-    const node=d&&d.data&&d.data[tcode];
-    const kls=node?(node.qfqday||node.day):null;
-    if(!kls||!kls.length)return null;
-    return kls.map(s=>{
-      const a=typeof s==='string'?s.split(','):s;
-      const v=+a[5],c=+a[2];
-      return{d:a[0],o:+a[1],c:c,h:+a[3],l:+a[4],v:v,a:Math.round(v*100*c)};
-    });
-  }catch(e){return null;}
+  const tcode=secidToTcode(secid);
+  const cached=klineCacheGet(tcode);
+  if(cached)return cached;
+  let k=null;
+  try{k=await klineWebIfzq(tcode);}catch(e){}
+  if(!k||k.length<25)try{k=await klineIfzq(tcode);}catch(e){}
+  if(!k||k.length<25)try{k=await klineSina(tcode);}catch(e){}
+  if(k)klineCacheSet(tcode,k);
+  return k;
 }
 
 /* ================= 技术指标引擎 ================= */
@@ -665,7 +713,7 @@ function renderReport(){
       <span class="industry-tag">${q.industry||'—'}</span>
       <button class="copy-btn" id="copyBtn">复制报告</button>
     </div>
-    <div class="meta-info">数据: ${ind.lastDate}${isToday?' (今日)':' (上一交易日)'} · 生成 <span class="num">${nowStr()}</span> · 数据源: ${q.demo?'内置演示数据':'东方财富'}</div>
+    <div class="meta-info">数据: ${ind.lastDate}${isToday?' (今日)':' (上一交易日)'} · 生成 <span class="num">${nowStr()}</span> · 数据源: ${q.demo?'内置演示数据':'腾讯实时/快照'}</div>
     <div class="base-row">${baseTags}</div>
   </section>
   ${banner}
