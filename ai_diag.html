@@ -363,7 +363,7 @@ async function apiKline(secid,n){
     const kls=node?(node.qfqday||node.day):null;
     if(!kls||!kls.length)return null;
     return kls.map(s=>{
-      const a=s.split(',');
+      const a=typeof s==='string'?s.split(','):s;
       const v=+a[5],c=+a[2];
       return{d:a[0],o:+a[1],c:c,h:+a[3],l:+a[4],v:v,a:Math.round(v*100*c)};
     });
