@@ -228,36 +228,13 @@ function boardOf(code,name){
   if(/^(8|4|92)/.test(code))return{t:'北交所 ±30%',limit:30};
   return{t:'主板 ±10%',limit:10};
 }
-/* fetch 失败自动降级 JSONP（东财接口支持 cb 回调） */
-let _cbSeq=0;
-function jsonp(url){
-  return new Promise((resolve,reject)=>{
-    const cb='_EMCB'+(++_cbSeq)+Date.now();
-    const sc=document.createElement('script');
-    const timer=setTimeout(()=>{cleanup();reject(new Error('jsonp timeout'));},9000);
-    function cleanup(){clearTimeout(timer);delete window[cb];sc.remove();}
-    window[cb]=d=>{cleanup();resolve(d);};
-    sc.src=url+(url.includes('?')?'&':'?')+'cb='+cb;
-    sc.onerror=()=>{cleanup();reject(new Error('jsonp error'));};
-    document.head.appendChild(sc);
-  });
-}
-async function getData(url){
-  try{
-    const r=await fetch(url,{cache:'no-store'});
-    if(r.ok)return await r.json();
-    throw new Error('http '+r.status);
-  }catch(e){
-    return await jsonp(url);
-  }
-}
-
 /* ================= 数据层 ================= */
-const EM_SEARCH='https://searchapi.eastmoney.com/api/suggest/get';
-const EM_QUOTE='https://push2.eastmoney.com/api/qt/stock/get';
-const EM_KLINE='https://push2his.eastmoney.com/api/qt/stock/kline/get';
-
-/* 仪表盘内嵌时优先走同源服务端代理（移动端浏览器直连东财常被跨域拦截），失败再降级直连+JSONP */
+/* 行情源分三级（自底向上优先）：
+   1) 快照 quote_cache.json —— 发布链路用 MCP 拉取的静态数据，同源 fetch
+   2) 腾讯 JSONP —— 报价 qt.gtimg.cn / 搜索 smartbox.gtimg.cn 用 script 注入读 window['v_xxx']
+      （两接口返回 GBK 赋值语句，script 方式避免乱码且绕过 CORS）；
+      K线 ifzq.gtimg.cn 允许跨域（ACAO:*），直接 fetch
+   3) 本地仪表盘 /report/ 下保留东财同源代理路径 */
 const IN_DASH=location.protocol.startsWith('http')&&location.pathname.startsWith('/report/');
 async function proxyJSON(path){
   const r=await fetch(path,{cache:'no-store'});
@@ -270,6 +247,65 @@ function parseKlines(kls){
     return{d:a[0],o:+a[1],c:+a[2],h:+a[3],l:+a[4],v:+a[5],a:+a[6]};
   });
 }
+
+/* ---- 快照层（MCP 发布链路生成） ---- */
+let _snap=null,_snapP=null;
+function getSnapshot(){
+  if(_snapP)return _snapP;
+  _snapP=fetch('./quote_cache.json',{cache:'no-store'})
+    .then(r=>{if(!r.ok)throw 0;return r.json()})
+    .then(d=>{_snap=d;return d})
+    .catch(()=>null);
+  return _snapP;
+}
+async function snapQuote(code){
+  const s=await getSnapshot();
+  const q=s&&s.quotes&&s.quotes[String(code)];
+  if(!q||q.demo)return null;
+  return{f57:code,f58:q.name||'',f43:q.price!=null?q.price*100:null,
+    f170:q.pct!=null?q.pct*100:null,f162:q.pe!=null?q.pe*100:null,
+    f167:q.pb!=null?q.pb*100:null,f168:q.turnover!=null?q.turnover*100:null,
+    f117:q.floatMv||null,f127:q.industry||''};
+}
+async function snapKline(code){
+  const s=await getSnapshot();
+  const kls=s&&s.klines&&s.klines[String(code)];
+  if(!kls||!kls.length)return null;
+  return kls.map(k=>({d:k.d,o:k.o,c:k.c,h:k.h,l:k.l,v:k.v,a:k.a}));
+}
+
+/* ---- 腾讯 script 注入（qt/smartbox 返回 GBK 赋值语句，script 方式避免乱码且绕过 CORS） ---- */
+function injectScript(src){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    const timer=setTimeout(()=>{cleanup();reject(new Error('行情接口超时'));},9000);
+    function cleanup(){clearTimeout(timer);s.remove();}
+    s.onload=()=>{cleanup();resolve();};
+    s.onerror=()=>{cleanup();reject(new Error('行情接口不可达'));};
+    s.src=src;
+    document.head.appendChild(s);
+  });
+}
+function secidToTcode(secid){
+  const p=String(secid).split('.');
+  const m=p[0],c=p[1]||p[0];
+  if(m==='1')return'sh'+c;
+  if(m==='0')return /^6/.test(c)?'sh'+c:'sz'+c;
+  if(m==='31')return'hk'+c;
+  return /^6/.test(c)?'sh'+c:'sz'+c;
+}
+/* 腾讯 ~ 分隔字段 -> 东财风格 data（消费端沿用 f57/f43/f170/f162/f167/f168/f117 命名） */
+function txQuoteToData(f,code){
+  const n=i=>f[i]!==''&&f[i]!=null?+f[i]:null;
+  return{f57:code,f58:f[1]||'',
+    f43:n(3)!=null?n(3)*100:null,f60:n(4)!=null?n(4)*100:null,
+    f46:n(5)!=null?n(5)*100:null,f44:n(33)!=null?n(33)*100:null,
+    f45:n(34)!=null?n(34)*100:null,f169:n(31)!=null?n(31)*100:null,
+    f170:n(32)!=null?n(32)*100:null,f162:n(39)!=null?n(39)*100:null,
+    f167:n(46)!=null?n(46)*100:null,f168:n(38)!=null?n(38)*100:null,
+    f117:n(44)!=null?n(44)*1e8:null,f116:n(45)!=null?n(45)*1e8:null,f127:''};
+}
+
 async function apiSearch(q){
   if(IN_DASH){
     try{
@@ -278,10 +314,18 @@ async function apiSearch(q){
       if(pl)return pl.filter(x=>x.Code&&/^\d{6}$/.test(x.Code));
     }catch(e){}
   }
-  const url=`${EM_SEARCH}?input=${encodeURIComponent(q)}&type=14&token=D43BF722C8E33BDC906FB84D85E326E8&count=10`;
-  const d=await getData(url);
-  const list=d&&d.QuotationCodeTable&&d.QuotationCodeTable.Data;
-  return (list||[]).filter(x=>x.Code&&/^\d{6}$/.test(x.Code));
+  try{
+    await injectScript(`https://smartbox.gtimg.cn/s3/?v=2&q=${encodeURIComponent(q)}&t=all&c=10`);
+    const raw=window['v_hint'];
+    if(!raw)return[];
+    return raw.split('^').filter(Boolean).map(s=>{
+      const f=s.split('~');
+      const Code=f[1],Name=f[2];
+      if(!Code||!/^\d{6}$/.test(Code)||!Name)return null;
+      const MktNum=f[0]==='sh'?'1':(f[0]==='sz'?'0':'2');
+      return{Code,Name,MktNum,QuoteID:MktNum+'.'+Code};
+    }).filter(Boolean);
+  }catch(e){return[];}
 }
 async function apiQuote(secid){
   if(IN_DASH){
@@ -290,9 +334,15 @@ async function apiQuote(secid){
       if(d&&d.data)return d.data;
     }catch(e){}
   }
-  const fields='f43,f44,f45,f46,f47,f48,f50,f57,f58,f60,f84,f85,f116,f117,f162,f167,f168,f169,f170,f171,f127';
-  const d=await getData(`${EM_QUOTE}?secid=${secid}&fields=${encodeURIComponent(fields)}`);
-  return d&&d.data?d.data:null;
+  const code=String(secid).split('.')[1]||String(secid);
+  try{const sd=await snapQuote(code);if(sd)return sd;}catch(e){}
+  try{
+    const tcode=secidToTcode(secid);
+    await injectScript('https://qt.gtimg.cn/q='+tcode);
+    const raw=window['v_'+tcode];
+    if(!raw||!raw.split)return null;
+    return txQuoteToData(raw.split('~'),code);
+  }catch(e){return null;}
 }
 async function apiKline(secid,n){
   if(IN_DASH){
@@ -302,11 +352,22 @@ async function apiKline(secid,n){
       if(kls&&kls.length)return parseKlines(kls);
     }catch(e){}
   }
-  const url=`${EM_KLINE}?secid=${secid}&klt=101&fqt=1&lmt=${n}&end=20500101&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61`;
-  const d=await getData(url);
-  const kls=d&&d.data&&d.data.klines;
-  if(!kls||!kls.length)return null;
-  return parseKlines(kls);
+  const code=String(secid).split('.')[1]||String(secid);
+  try{const sk=await snapKline(code);if(sk)return sk;}catch(e){}
+  try{
+    const tcode=secidToTcode(secid);
+    const r=await fetch(`https://ifzq.gtimg.cn/appstock/app/fqkline/get?param=${tcode},day,,,${n},qfq`,{cache:'no-store'});
+    if(!r.ok)throw 0;
+    const d=JSON.parse(await r.text());
+    const node=d&&d.data&&d.data[tcode];
+    const kls=node?(node.qfqday||node.day):null;
+    if(!kls||!kls.length)return null;
+    return kls.map(s=>{
+      const a=s.split(',');
+      const v=+a[5],c=+a[2];
+      return{d:a[0],o:+a[1],c:c,h:+a[3],l:+a[4],v:v,a:Math.round(v*100*c)};
+    });
+  }catch(e){return null;}
 }
 
 /* ================= 技术指标引擎 ================= */
