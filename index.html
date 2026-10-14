@@ -105,6 +105,7 @@ tbody tr:hover { background:#1a1f2e; }
   <div class="nav-item" data-page="review">每日复盘<span class="dot"></span></div>
   <div class="nav-item" data-page="hb_breakout">横盘突破<span class="dot"></span></div>
   <div class="nav-item" data-page="sim">模拟交易<span class="dot"></span></div>
+  <div class="nav-item" data-page="diag">AI诊股</div>
 </div>
 
 <div class="content">
@@ -130,12 +131,13 @@ tbody tr:hover { background:#1a1f2e; }
   <div class="page" id="page-review"><iframe data-src="./daily_review.html"></iframe></div>
   <div class="page" id="page-hb_breakout"><iframe data-src="./hb_breakout.html"></iframe></div>
   <div class="page" id="page-sim"><iframe data-src="./simulated_trade.html"></iframe></div>
+  <div class="page" id="page-diag"><iframe data-src="./ai_diag.html"></iframe></div>
 </div>
 
 <div id="toast"></div>
 
 <!-- 云端静态数据（发布时注入：当日竞价选股 + 站点信息） -->
-<script id="boot-data" type="application/json">{"site": "https://jjungp.top/", "generated": "2026-10-14 07:41", "picks": [{"code": "603528", "tcode": "sh603528", "name": "多伦科技", "auction_chg": 3.546099290780136, "score": 1.0, "industry": "软件和信息技术服务业"}]}</script>
+<script id="boot-data" type="application/json">{"site": "https://jjungp.top/", "generated": "2026-10-14 07:48", "picks": [{"code": "603528", "tcode": "sh603528", "name": "多伦科技", "auction_chg": 3.546099290780136, "score": 1.0, "industry": "软件和信息技术服务业"}]}</script>
 
 <script>
 const $ = s => document.querySelector(s);
